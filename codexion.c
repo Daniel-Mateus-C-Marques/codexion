@@ -6,7 +6,7 @@
 /*   By: danicamp <danicamp@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/22 14:32:54 by danicamp          #+#    #+#             */
-/*   Updated: 2026/09/24 20:31:30 by danicamp         ###   ########.fr       */
+/*   Updated: 2026/11/05 13:46:30 by danicamp         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,11 +45,11 @@ int	init_sim(t_sim *program, t_config config)
 	program->config = config;
 	program->coders = malloc(sizeof(t_coder) * config.number_of_coders);
 	if (!program->coders)
-	return (-1);
+		return (-1);
 	program->dongles = malloc(sizeof(t_dongle) * config.number_of_coders);
 	if (!program->dongles)
 	{
-		free(program->dongles);
+		free(program->coders);
 		return (-1);
 	}
 	return (0);

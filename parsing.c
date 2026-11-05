@@ -6,7 +6,7 @@
 /*   By: danicamp <danicamp@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/20 14:30:44 by danicamp          #+#    #+#             */
-/*   Updated: 2026/09/23 20:53:16 by danicamp         ###   ########.fr       */
+/*   Updated: 2026/11/05 13:48:26 by danicamp         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,11 +44,11 @@ static t_scheduler scheduler_parser(char *scheduler)
 		i++;
 	}
 	if (!strcmp("fifo", scheduler))
-		return (0);
+		return (FIFO);
 	else if (!strcmp("edf", scheduler))
-		return (1);
+		return (EDF);
 	else
-		return (2);
+		return (ERROR);
 }
 
 t_config parser(char **argv)

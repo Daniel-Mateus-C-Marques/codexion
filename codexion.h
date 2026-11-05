@@ -6,6 +6,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
+# include <sys/time.h>
 
 typedef enum e_scheduler
 {
@@ -64,5 +65,8 @@ typedef struct s_sim
 
 	// Parsing Utils
 	long		ft_atoi(const char *nptr);
+
+	// Time
+	long		get_time_ms(void);
 
 #endif
