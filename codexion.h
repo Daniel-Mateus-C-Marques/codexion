@@ -81,4 +81,13 @@ typedef struct s_sim
 	// test
 	void	debug_print_sim(t_sim *sim);
 
+	// Routine
+	void	*coder_routine(void *arg);
+
+	// Log
+	void	print_log(t_coder *coder, char *action);
+
+	// Simulator
+	int		start_threads(t_sim *program);
+
 #endif

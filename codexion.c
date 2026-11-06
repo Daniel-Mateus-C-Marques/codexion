@@ -6,7 +6,7 @@
 /*   By: danicamp <danicamp@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/22 14:32:54 by danicamp          #+#    #+#             */
-/*   Updated: 2026/11/06 12:14:35 by danicamp         ###   ########.fr       */
+/*   Updated: 2026/11/06 16:50:51 by danicamp         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,10 @@ int	init_sim(t_sim *program, t_config config)
 {
 	program->config = config;
 	program->coders = malloc(sizeof(t_coder) * config.number_of_coders);
+	if (pthread_mutex_init(&program->end_lock, NULL))
+		return (-1);
+	if (pthread_mutex_init(&program->log_lock, NULL))
+		return (pthread_mutex_destroy(&program->end_lock), -1);
 	if (!program->coders)
 		return (-1);
 	program->dongles = malloc(sizeof(t_dongle) * config.number_of_coders);
@@ -40,6 +44,7 @@ int	init_sim(t_sim *program, t_config config)
 		free(program->coders);
 		return (-1);
 	}
+	program->simulation_over = 0;
 	init_dongles(program);
 	init_coders(program);
 	return (0);
@@ -67,6 +72,6 @@ int main(int argc, char **argv)
 		return (1);
 	}
 	assign_dongle(&program, config);
-	debug_print_sim(&program);
+	start_threads(&program);
 	return (0);
 }
