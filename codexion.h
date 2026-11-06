@@ -8,6 +8,8 @@
 # include <string.h>
 # include <sys/time.h>
 
+typedef struct s_sim	t_sim;
+
 typedef enum e_scheduler
 {
 	FIFO,
@@ -45,6 +47,7 @@ typedef struct s_coder
 	long			last_compile_start;
 	int				compiles_done;
 	pthread_mutex_t	state_lock;
+	t_sim			*program;
 }	t_coder;
 
 typedef struct s_sim
@@ -68,5 +71,14 @@ typedef struct s_sim
 
 	// Time
 	long		get_time_ms(void);
+
+	// Dongles
+	int		init_dongles(t_sim *sim);
+
+	// Coders
+	int		init_coders(t_sim *program);
+
+	// test
+	void	debug_print_sim(t_sim *sim);
 
 #endif

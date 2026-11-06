@@ -6,23 +6,11 @@
 /*   By: danicamp <danicamp@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/22 14:32:54 by danicamp          #+#    #+#             */
-/*   Updated: 2026/11/05 13:46:30 by danicamp         ###   ########.fr       */
+/*   Updated: 2026/11/06 12:14:35 by danicamp         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
-
-void print_config(t_config config)
-{
-	printf("coders: %d\n", config.number_of_coders);
-	printf("burnout: %d\n", config.time_to_burnout);
-	printf("compile: %d\n", config.time_to_compile);
-	printf("debug: %d\n", config.time_to_debug);
-	printf("refactor: %d\n", config.time_to_refactor);
-	printf("c_required: %d\n", config.number_of_compiles_required);
-	printf("d_cooldown: %d\n", config.dongle_cooldown);
-	printf("scheduler: %d\n", config.scheduler);
-}
 
 void	assign_dongle(t_sim *program, t_config config)
 {
@@ -52,6 +40,8 @@ int	init_sim(t_sim *program, t_config config)
 		free(program->coders);
 		return (-1);
 	}
+	init_dongles(program);
+	init_coders(program);
 	return (0);
 }
 
@@ -66,7 +56,6 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	config = parser(argv);
-	print_config(config);
 	if (!config_checker(config))
 	{
 		fprintf(stderr, "Wrong argument provided.\n");
@@ -78,5 +67,6 @@ int main(int argc, char **argv)
 		return (1);
 	}
 	assign_dongle(&program, config);
+	debug_print_sim(&program);
 	return (0);
 }
