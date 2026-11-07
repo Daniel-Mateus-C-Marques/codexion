@@ -73,21 +73,21 @@ typedef struct s_sim
 	long		get_time_ms(void);
 
 	// Dongles
-	int		init_dongles(t_sim *sim);
+	int			init_dongles(t_sim *sim);
 
 	// Coders
-	int		init_coders(t_sim *program);
+	int			init_coders(t_sim *program);
 
 	// test
-	void	debug_print_sim(t_sim *sim);
+	void		debug_print_sim(t_sim *sim);
 
 	// Routine
-	void	*coder_routine(void *arg);
+	void		*coder_routine(void *arg);
 
 	// Log
-	void	print_log(t_coder *coder, char *action);
+	void		print_log(t_coder *coder, char *action);
 
 	// Simulator
-	int		start_threads(t_sim *program);
+	int			start_threads(t_sim *program);
 
-#endif
+	#endif

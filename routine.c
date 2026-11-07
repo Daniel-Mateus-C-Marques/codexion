@@ -6,7 +6,7 @@
 /*   By: danicamp <danicamp@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/06 13:45:57 by danicamp          #+#    #+#             */
-/*   Updated: 2026/11/07 14:21:47 by danicamp         ###   ########.fr       */
+/*   Updated: 2026/11/07 16:32:26 by danicamp         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,10 @@ static int		stop_simulation(t_sim *program)
 
 static void	is_compiling(t_coder *coder)
 {
+	pthread_mutex_lock(&coder->state_lock);
+	coder->compiles_done ++;
+	coder->last_compile_start = coder->program->start_time - get_time_ms();
+	pthread_mutex_unlock(&coder->state_lock);
 	print_log(coder, "is compiling");
 	usleep(coder->program->config.time_to_compile * 1000);
 }
@@ -46,7 +50,6 @@ static void	get_dongle(t_dongle *dongle)
 	pthread_mutex_lock(&dongle->lock);
 	while (dongle->in_use)
 		pthread_cond_wait(&dongle->cond, &dongle->lock);
-	/* aqui o mutex está trancado e a condição é verdadeira */
 	dongle->in_use = 1;
 	pthread_mutex_unlock(&dongle->lock);
 }
