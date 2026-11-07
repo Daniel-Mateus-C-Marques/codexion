@@ -6,7 +6,7 @@
 /*   By: danicamp <danicamp@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/22 14:32:54 by danicamp          #+#    #+#             */
-/*   Updated: 2026/11/06 16:50:51 by danicamp         ###   ########.fr       */
+/*   Updated: 2026/11/07 13:25:44 by danicamp         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,10 @@ int main(int argc, char **argv)
 
 	if (argc != 9)
 	{
-		fprintf(stderr, "Wrong number of arguments!\n");
+		fprintf(stderr, "Wrong number of arguments! 8 Arguments required.\n"
+						"Usage: ./codexion number_of_coders time_to_burnout time_to_compile "
+						"time_to_debug time_to_refactor number_of_compiles_required "
+						"dongle_cooldown scheduler(fifo|edf)\n");
 		return 1;
 	}
 	config = parser(argv);
