@@ -6,7 +6,7 @@
 /*   By: danicamp <danicamp@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/06 13:45:57 by danicamp          #+#    #+#             */
-/*   Updated: 2026/11/07 16:32:26 by danicamp         ###   ########.fr       */
+/*   Updated: 2026/11/09 17:57:16 by danicamp         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ static void	is_compiling(t_coder *coder)
 {
 	pthread_mutex_lock(&coder->state_lock);
 	coder->compiles_done ++;
-	coder->last_compile_start = coder->program->start_time - get_time_ms();
+	coder->last_compile_start = get_time_ms() - coder->program->start_time;
 	pthread_mutex_unlock(&coder->state_lock);
 	print_log(coder, "is compiling");
 	usleep(coder->program->config.time_to_compile * 1000);
@@ -56,10 +56,13 @@ static void	get_dongle(t_dongle *dongle)
 
 static void	take_dongles(t_coder *coder)
 {
-	get_dongle(coder->left_dongle);
-	print_log(coder, "has taken a dongle");
-	get_dongle(coder->right_dongle);
-	print_log(coder, "has taken a dongle");
+	if (!coder->left_dongle->in_use && !coder->right_dongle->in_use)
+	{
+		get_dongle(coder->left_dongle);
+		print_log(coder, "has taken a dongle");
+		get_dongle(coder->right_dongle);
+		print_log(coder, "has taken a dongle");
+	}
 }
 
 static void	free_dongle(t_dongle *dongle)
@@ -74,6 +77,7 @@ static void	leave_dongles(t_coder *coder)
 {
 	free_dongle(coder->left_dongle);
 	free_dongle(coder->right_dongle);
+	usleep((coder->program->config.dongle_cooldown) * 1000);
 }
 
 void	*coder_routine(void *arg)
@@ -85,14 +89,17 @@ void	*coder_routine(void *arg)
 	comp = 0;
 	while (!stop_simulation(coder->program))
 	{
-		take_dongles(coder);
-		is_compiling(coder);
-		is_debbuging(coder);
-		is_refactoring(coder);
+		if (!coder->right_dongle->in_use && !coder->left_dongle->in_use)
+		{
+			take_dongles(coder);
+			is_compiling(coder);
+			is_debbuging(coder);
+			is_refactoring(coder);
+		}
 		leave_dongles(coder);
 		comp++;
 		if (comp == coder->program->config.number_of_compiles_required)
-			coder->program->simulation_over = 1;
+		coder->program->simulation_over = 1;
 	}
 	return (NULL);
 }
