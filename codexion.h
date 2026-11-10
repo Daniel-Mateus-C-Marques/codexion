@@ -71,6 +71,7 @@ typedef struct s_sim
 
 	// Time
 	long		get_time_ms(void);
+	long		current_time(t_sim *program);
 
 	// Dongles
 	int			init_dongles(t_sim *sim);
