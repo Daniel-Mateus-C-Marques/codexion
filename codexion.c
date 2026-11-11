@@ -6,7 +6,7 @@
 /*   By: danicamp <danicamp@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/22 14:32:54 by danicamp          #+#    #+#             */
-/*   Updated: 2026/11/07 13:25:44 by danicamp         ###   ########.fr       */
+/*   Updated: 2026/11/11 15:11:04 by danicamp         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ void	assign_dongle(t_sim *program, t_config config)
 int	init_sim(t_sim *program, t_config config)
 {
 	program->config = config;
+	program->start_time = get_time_ms();
 	program->coders = malloc(sizeof(t_coder) * config.number_of_coders);
 	if (pthread_mutex_init(&program->end_lock, NULL))
 		return (-1);
@@ -45,6 +46,7 @@ int	init_sim(t_sim *program, t_config config)
 		return (-1);
 	}
 	program->simulation_over = 0;
+	program->coders_done = 0;
 	init_dongles(program);
 	init_coders(program);
 	return (0);

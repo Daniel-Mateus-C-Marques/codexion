@@ -6,7 +6,7 @@
 /*   By: danicamp <danicamp@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/05 17:34:15 by danicamp          #+#    #+#             */
-/*   Updated: 2026/11/06 11:57:45 by danicamp         ###   ########.fr       */
+/*   Updated: 2026/11/11 14:45:49 by danicamp         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ int	init_coders(t_sim *program)
 		program->coders[i].compiles_done = 0;
 		program->coders[i].last_compile_start = program->start_time;
 		program->coders[i].program = program;
+		program->coders[i].done = 0;
 		set_coder_dongles(program, i);
 		if (pthread_mutex_init(&program->coders[i].state_lock, NULL) != 0)
 		{

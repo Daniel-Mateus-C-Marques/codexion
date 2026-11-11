@@ -6,7 +6,7 @@
 /*   By: danicamp <danicamp@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/06 13:45:57 by danicamp          #+#    #+#             */
-/*   Updated: 2026/11/10 17:04:39 by danicamp         ###   ########.fr       */
+/*   Updated: 2026/11/11 14:57:47 by danicamp         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,15 +15,23 @@
 static int		stop_simulation(t_coder *coder)
 {
 	int	status;
-	
+	int	coders_done;
+
 	status = 0;
-	if (coder->compiles_done >= coder->program->config.number_of_compiles_required)
+	coders_done = 0;
+	pthread_mutex_lock(&coder->program->end_lock);
+	coders_done = coder->program->coders_done;
+	if (coder->compiles_done == coder->program->config.number_of_compiles_required
+		&& !coder->done)
+		coder->program->coders_done++;
+	if (coder->compiles_done == coder->program->config.number_of_compiles_required)
+			coder->done = 1;
+	if (coders_done == coder->program->config.number_of_coders)
 	{	
-		pthread_mutex_lock(&coder->program->end_lock);
 		coder->program->simulation_over = 1;
 		status = coder->program->simulation_over;
-		pthread_mutex_unlock(&coder->program->end_lock);
 	}
+	pthread_mutex_unlock(&coder->program->end_lock);
 	return (status);
 }
 
@@ -50,17 +58,17 @@ static void	is_refactoring(t_coder *coder)
 	usleep(coder->program->config.time_to_refactor * 1000);	
 }
 
-static int	get_dongle(t_dongle *dongle, t_sim *program)
+static void	get_dongle(t_dongle *dongle, t_sim *program)
 {
 	pthread_mutex_lock(&dongle->lock);
-	if (dongle->in_use || dongle->available_at > current_time(program))
-	{	
+	while (dongle->in_use || dongle->available_at > current_time(program))
+	{
 		pthread_mutex_unlock(&dongle->lock);
-		return (0);
+		usleep(1000);
+		pthread_mutex_lock(&dongle->lock);
 	}
 	dongle->in_use = 1;
 	pthread_mutex_unlock(&dongle->lock);
-	return (1);
 }
 
 static void	free_dongle(t_dongle *dongle, t_sim *program)
@@ -73,12 +81,11 @@ static void	free_dongle(t_dongle *dongle, t_sim *program)
 	{
 		dongle->available_at = current_time(program) + cooldown;
 		dongle->in_use = 0;
-		pthread_cond_broadcast(&dongle->cond);
 	}
 	pthread_mutex_unlock(&dongle->lock);
 }
 
-static int	take_dongles(t_coder *coder)
+static void	take_dongles(t_coder *coder)
 {
 	t_dongle	*first;
 	t_dongle	*second;
@@ -93,16 +100,10 @@ static int	take_dongles(t_coder *coder)
 		first = coder->right_dongle;
 		second = coder->left_dongle;
 	}
-	if (!get_dongle(first, coder->program))
-		return (0);
-	if (!get_dongle(second, coder->program))
-	{
-		free_dongle(first, coder->program);
-		return (0);
-	}
+	get_dongle(first, coder->program);
 	print_log(coder, "has taken a dongle");
+	get_dongle(second, coder->program);
 	print_log(coder, "has taken a dongle");
-	return (1);
 }
 
 
@@ -119,8 +120,9 @@ void	*coder_routine(void *arg)
 	coder = (t_coder *)arg;
 	while (!stop_simulation(coder))
 	{
-		if (take_dongles(coder))
+		if (!coder->done)
 		{
+			take_dongles(coder);
 			is_compiling(coder);
 			is_debbuging(coder);
 			is_refactoring(coder);

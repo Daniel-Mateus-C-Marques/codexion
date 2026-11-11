@@ -44,6 +44,7 @@ typedef struct s_coder
 	pthread_t		thread;
 	t_dongle		*left_dongle;
 	t_dongle		*right_dongle;
+	int				done;
 	long			last_compile_start;
 	int				compiles_done;
 	pthread_mutex_t	state_lock;
@@ -58,6 +59,7 @@ typedef struct s_sim
 	long			start_time;
 	pthread_mutex_t	log_lock;
 	int				simulation_over;
+	int				coders_done;
 	pthread_mutex_t	end_lock;
 	pthread_t		monitor_thread;
 }	t_sim;
