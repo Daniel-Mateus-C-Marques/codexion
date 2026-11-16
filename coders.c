@@ -6,7 +6,7 @@
 /*   By: danicamp <danicamp@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/05 17:34:15 by danicamp          #+#    #+#             */
-/*   Updated: 2026/11/11 14:45:49 by danicamp         ###   ########.fr       */
+/*   Updated: 2026/11/16 14:57:44 by danicamp         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ int	init_coders(t_sim *program)
 	{
 		program->coders[i].id = i + 1;
 		program->coders[i].compiles_done = 0;
-		program->coders[i].last_compile_start = program->start_time;
+		program->coders[i].last_compile_start = 0;
 		program->coders[i].program = program;
 		program->coders[i].done = 0;
 		set_coder_dongles(program, i);

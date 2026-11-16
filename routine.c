@@ -6,7 +6,7 @@
 /*   By: danicamp <danicamp@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/06 13:45:57 by danicamp          #+#    #+#             */
-/*   Updated: 2026/11/11 14:57:47 by danicamp         ###   ########.fr       */
+/*   Updated: 2026/11/16 16:14:57 by danicamp         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,17 @@ static int		stop_simulation(t_coder *coder)
 	status = 0;
 	coders_done = 0;
 	pthread_mutex_lock(&coder->program->end_lock);
-	coders_done = coder->program->coders_done;
+	if (coder->program->simulation_over)
+	{
+		pthread_mutex_unlock(&coder->program->end_lock);
+		return (1);
+	}
 	if (coder->compiles_done == coder->program->config.number_of_compiles_required
 		&& !coder->done)
 		coder->program->coders_done++;
 	if (coder->compiles_done == coder->program->config.number_of_compiles_required)
 			coder->done = 1;
+	coders_done = coder->program->coders_done;
 	if (coders_done == coder->program->config.number_of_coders)
 	{	
 		coder->program->simulation_over = 1;
@@ -66,6 +71,11 @@ static void	get_dongle(t_dongle *dongle, t_sim *program)
 		pthread_mutex_unlock(&dongle->lock);
 		usleep(1000);
 		pthread_mutex_lock(&dongle->lock);
+		if (program->simulation_over)
+		{
+			pthread_mutex_unlock(&dongle->lock);
+			return;
+		}
 	}
 	dongle->in_use = 1;
 	pthread_mutex_unlock(&dongle->lock);
@@ -89,7 +99,7 @@ static void	take_dongles(t_coder *coder)
 {
 	t_dongle	*first;
 	t_dongle	*second;
-	
+
 	if (coder->left_dongle->id < coder->right_dongle->id)
 	{
 		first = coder->left_dongle;
@@ -101,8 +111,12 @@ static void	take_dongles(t_coder *coder)
 		second = coder->left_dongle;
 	}
 	get_dongle(first, coder->program);
+	if (coder->program->simulation_over)
+		return;
 	print_log(coder, "has taken a dongle");
 	get_dongle(second, coder->program);
+	if (coder->program->simulation_over)
+		return;
 	print_log(coder, "has taken a dongle");
 }
 
@@ -123,9 +137,12 @@ void	*coder_routine(void *arg)
 		if (!coder->done)
 		{
 			take_dongles(coder);
-			is_compiling(coder);
-			is_debbuging(coder);
-			is_refactoring(coder);
+			if (!coder->program->simulation_over)
+			{
+				is_compiling(coder);
+				is_debbuging(coder);
+				is_refactoring(coder);
+			}
 			leave_dongles(coder);
 		}
 	}

@@ -89,6 +89,9 @@ typedef struct s_sim
 
 	// Log
 	void		print_log(t_coder *coder, char *action);
+	
+	// Monitor
+	void		*monitor_routine(void *arg);
 
 	// Simulator
 	int			start_threads(t_sim *program);
